@@ -4,7 +4,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 
-class Categories(models.Model):
+class categories(models.Model):
     category_id = models.AutoField(primary_key=True)
     category_name = models.CharField(max_length=20)
 
@@ -13,7 +13,7 @@ class Categories(models.Model):
         db_table = 'categories'
 
 
-class Colors(models.Model):
+class colors(models.Model):
     color_id = models.CharField(primary_key=True, max_length=15)
     color_name = models.CharField(max_length=25)
     color_category = models.CharField(max_length=25)
@@ -23,7 +23,7 @@ class Colors(models.Model):
         db_table = 'colors'
 
 
-class Deliveries(models.Model):
+class deliveries(models.Model):
     delivery_id = models.AutoField(primary_key=True)
     delivery_date = models.DateField()
     delivery_price = models.IntegerField()
@@ -36,7 +36,7 @@ class Deliveries(models.Model):
         db_table = 'deliveries'
 
 
-class Orders(models.Model):
+class orders(models.Model):
     order_id = models.AutoField(primary_key=True)
     order_date = models.DateField()
     order_status = models.CharField(max_length=12)
@@ -48,7 +48,7 @@ class Orders(models.Model):
         db_table = 'orders'
 
 
-class ProductColor(models.Model):
+class productColor(models.Model):
     product = models.OneToOneField('Products', models.DO_NOTHING, primary_key=True)
     color = models.ForeignKey(Colors, models.DO_NOTHING)
     color_stock = models.IntegerField()
@@ -59,7 +59,7 @@ class ProductColor(models.Model):
         unique_together = (('product', 'color'),)
 
 
-class Products(models.Model):
+class products(models.Model):
     product_id = models.AutoField(primary_key=True)
     product_name = models.CharField(max_length=30)
     product_price = models.IntegerField()
@@ -73,7 +73,7 @@ class Products(models.Model):
         db_table = 'products'
 
 
-class Sales(models.Model):
+class sales(models.Model):
     product = models.OneToOneField(Products, models.DO_NOTHING, primary_key=True)
     order = models.ForeignKey(Orders, models.DO_NOTHING)
     sale_quantity = models.SmallIntegerField()
@@ -85,7 +85,7 @@ class Sales(models.Model):
         unique_together = (('product', 'order'),)
 
 
-class Users(AbstractUser):
+class users(AbstractUser):
     userid = models.AutoField(primary_key=True)
     usermail = models.CharField(max_length=30,unique=True)
     username = models.CharField(max_length=30)
@@ -97,7 +97,7 @@ class Users(AbstractUser):
     REQUIRED_FIELDS = []
 
 
-class Wishes(models.Model):
+class wishes(models.Model):
     product = models.OneToOneField(Products, models.DO_NOTHING, primary_key=True)
     userid = models.ForeignKey(Users, models.DO_NOTHING, db_column='userid')
     whis_date = models.DateField()

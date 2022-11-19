@@ -84,10 +84,7 @@ DATABASES = {
         'PORT':'3306',
         'USER':'root',
         'PASSWORD':'admin',
-        'NAME': 'dentistore',
-        'OPTIONS':{
-            'init_command':"SET sql_mode='STRICT_TRANS_TABLES'"
-        }
+        'NAME': 'dentistore'
     }
 }
 
@@ -114,7 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es'
 
 TIME_ZONE = 'UTC'
 
