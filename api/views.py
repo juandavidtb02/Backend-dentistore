@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from .serializer import UserSerializer,CategoriesSerializer
-from .models import Users,Categories
+from .models import Users,Categories,UserLog
 from .jwt_validate.validate import validar,refresh_token
 
 import jwt,datetime,re
@@ -28,7 +28,6 @@ class LoginView(APIView):
             
         if not user.check_password(password):
             raise AuthenticationFailed('Datos de usuario incorrectos!')
-
         
         payload = {
             'id':user.userid,
@@ -41,8 +40,13 @@ class LoginView(APIView):
         token = jwt.encode(payload,'secret', algorithm='HS256')
 
         response = Response()
-        id = user.userid
-        request.session[f'{id}'] = token
+        uid = user.userid
+        try:
+            log = UserLog.objects.create(id=uid,token=token)
+        except:
+            raise AuthenticationFailed('Usuario ya se encuentra logeado!')
+            
+
         response.data = {
             'jwt': token
         }
@@ -75,19 +79,21 @@ class LogoutView(APIView):
             token = g.group(1)
             payload = jwt.decode(token, 'secret', algorithms=['HS256'])
         except jwt.ExpiredSignatureError:
+            UserLog.objects.filter(token=token).delete()
             raise AuthenticationFailed('La sesión no existe! Error 02')
-
         id = payload['id']
-        if f'{id}' in request.session:
-            del request.session[f'{id}']
-        else: 
+        user = UserLog.objects.filter(id=id).first()
+
+        try:
+            UserLog.objects.filter(id=id).delete()
+            if id == user.id:
+                response = Response()
+        
+            response.data = {
+                'message':'Sesion cerrada'
+            }
+        except:
             raise AuthenticationFailed('La sesión no existe! Error 03')
-        
-        response = Response()
-        
-        response.data = {
-            'message':'Sesion cerrada'
-        }
         return response
 
 class CategoriesView(APIView):

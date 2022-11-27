@@ -106,3 +106,11 @@ class Wishes(models.Model):
         managed = False
         db_table = 'wishes'
         unique_together = (('product', 'userid'),)
+
+class UserLog(models.Model):
+    id = models.IntegerField(primary_key=True)
+    token = models.CharField(max_length=300)
+
+    class Meta:
+        managed = False
+        db_table = 'userlog'
