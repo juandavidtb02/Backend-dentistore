@@ -7,6 +7,7 @@ from django.contrib.auth.models import AbstractUser
 class Categories(models.Model):
     category_id = models.AutoField(primary_key=True)
     category_name = models.CharField(max_length=20)
+    image = models.TextField()
 
     class Meta:
         managed = False
@@ -88,13 +89,13 @@ class Sales(models.Model):
 class Users(AbstractUser):
     userid = models.AutoField(primary_key=True)
     usermail = models.CharField(max_length=30,unique=True)
-    username = models.CharField(max_length=30)
+    username = models.CharField(max_length=30,unique=True)
     password_user = models.CharField(max_length=256)
     userphone = models.CharField(max_length=12, blank=True, null=True)
     userrole = models.CharField(max_length=15, blank=True, null=True)
 
-    USERNAME_FIELD = 'usermail'
-    REQUIRED_FIELDS = []
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['first_name' , 'last_name'] 
 
 
 class Wishes(models.Model):

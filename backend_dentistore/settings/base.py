@@ -1,5 +1,6 @@
 from pathlib import Path
 from corsheaders.defaults import default_headers
+import os
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -155,3 +156,6 @@ SESSION_COOKIE_AGE = 3600
 
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR,'media')

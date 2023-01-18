@@ -1,21 +1,22 @@
 from rest_framework.exceptions import AuthenticationFailed
-
+from ..models import UserLog,Users
 import jwt,datetime,re
 
-def validar(token,request):
-    g = re.match("^Bearer\s+(.*)", token)
+def validar(tokenu,request):
+    g = re.match("^Bearer\s+(.*)", tokenu)
     if not g:
         raise AuthenticationFailed('Error de autenticación! 01')
 
     try:
-        token = g.group(1)
-        payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        tokenu = g.group(1)
+        payload = jwt.decode(tokenu, 'secret', algorithms=['HS256'])
     except jwt.ExpiredSignatureError:
+        UserLog.objects.filter(token=tokenu).delete()
         raise AuthenticationFailed('Error de autenticación! 02')
 
-    id = payload['id']
 
-    if f'{id}' not in  request.session:
+    user = list(UserLog.objects.filter(token=tokenu).values())
+    if len(user) == 0:
         raise AuthenticationFailed('Error de autenticación! 03')
     
     
@@ -34,5 +35,23 @@ def refresh_token(payload,request):
     }
     new_token = jwt.encode(new_payload,'secret', algorithm='HS256')
     id = payload['id']
-    request.session[f'{id}'] = new_token
+    user = UserLog.objects.filter(id=id).first()
+    user.token = new_token
+    user.save()
     return new_token
+
+def its_admin(token):
+    try:
+        payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+    except jwt.ExpiredSignatureError:
+        raise AuthenticationFailed('Error de autenticación! 02')
+
+    if (payload['role'] == 'admin'):    
+        user = list(Users.objects.filter(usermail=payload['usermail'],userrole='admin').values())
+        if len(user) == 0:
+            raise AuthenticationFailed('Error de autenticacion! 03')
+    else:
+        raise AuthenticationFailed('Error de autencicacion! n_a')
+
+
+    return True
