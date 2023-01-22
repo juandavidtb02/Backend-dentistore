@@ -109,7 +109,7 @@ class CategoriesView(APIView):
         new_token = refresh_token(payload,request)
 
         category_name = request.data['category_name']
-        category_image = request.data['image']
+        category_image = request.data['category_image']
         if category_image != '':
             with category_image.open("rb") as image_file:
                 encoded_string = base64.b64encode(image_file.read())

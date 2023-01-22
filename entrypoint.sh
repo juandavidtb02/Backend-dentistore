@@ -6,6 +6,7 @@
 echo 'Running migrations...'
 python manage.py wait_for_db --settings=backend_dentistore.settings.production
 python manage.py makemigrations api --settings=backend_dentistore.settings.production
+python manage.py sqlmigration api 0001 --settings=backend_dentistore.settings.production
 python manage.py migrate --settings=backend_dentistore.settings.production
 
 

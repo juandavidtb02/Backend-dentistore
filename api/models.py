@@ -7,7 +7,7 @@ from django.contrib.auth.models import AbstractUser
 class Categories(models.Model):
     category_id = models.AutoField(primary_key=True)
     category_name = models.CharField(max_length=20)
-    image = models.TextField()
+    category_image = models.TextField()
 
     class Meta:
         managed = False
@@ -67,11 +67,22 @@ class Products(models.Model):
     product_stock = models.IntegerField()
     product_image = models.CharField(max_length=200, blank=True, null=True)
     product_descrip = models.CharField(max_length=300, blank=True, null=True)
+    product_details = models.CharField(max_length=300, blank=True, null=True)
     category = models.ForeignKey(Categories, models.DO_NOTHING)
 
     class Meta:
         managed = False
         db_table = 'products'
+
+class Images_products(models.Model):
+    image_id = models.AutoField(primary_key=True)
+    image_name = models.CharField(max_length=30)
+    image_text = models.TextField()
+    product = models.ForeignKey(Products, models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'images_products'
 
 
 class Sales(models.Model):
@@ -86,6 +97,26 @@ class Sales(models.Model):
         unique_together = (('product', 'order'),)
 
 
+class Size(models.Model):
+    size_id = models.AutoField(primary_key=True)
+    size_name = models.CharField(max_length=40, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'size'
+
+class Product_size(models.Model):
+    product = models.OneToOneField(Products, models.DO_NOTHING, primary_key=True)
+    size = models.ForeignKey(Size, models.DO_NOTHING)
+    size_stock = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'product_size'
+        unique_together = (('product', 'size'),)
+
+
+
 class Users(AbstractUser):
     userid = models.AutoField(primary_key=True)
     usermail = models.CharField(max_length=30,unique=True)
@@ -97,16 +128,6 @@ class Users(AbstractUser):
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['first_name' , 'last_name'] 
 
-
-class Wishes(models.Model):
-    product = models.OneToOneField(Products, models.DO_NOTHING, primary_key=True)
-    userid = models.ForeignKey(Users, models.DO_NOTHING, db_column='userid')
-    whis_date = models.DateField()
-
-    class Meta:
-        managed = False
-        db_table = 'wishes'
-        unique_together = (('product', 'userid'),)
 
 class UserLog(models.Model):
     id = models.IntegerField(primary_key=True)
