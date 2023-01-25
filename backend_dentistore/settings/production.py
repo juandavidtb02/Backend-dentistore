@@ -18,7 +18,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'HOST':'10.48.0.5',
         'PORT':'3306',
-        'USER':'root',
+        'USER':'backend',
         'PASSWORD':'d3nt1st0r3',
         'NAME': 'dentistore'
     }
