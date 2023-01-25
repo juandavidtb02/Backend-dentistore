@@ -16,5 +16,5 @@ RUN pip install -r requeriments.txt
 
 COPY ./ ./
 
+EXPOSE 8000
 CMD ["sh","entrypoint.sh"]
-

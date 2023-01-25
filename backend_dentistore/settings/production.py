@@ -13,27 +13,27 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST':'10.48.0.5',
+        'PORT':'3306',
+        'USER':'root',
+        'PASSWORD':'d3nt1st0r3',
+        'NAME': 'dentistore'
+    }
+}
+
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
-#         'HOST':'localhost',
+#         'HOST':'db',
 #         'PORT':'3306',
-#         'USER':'root',
+#         'USER':'admin',
 #         'PASSWORD':'admin',
 #         'NAME': 'dentistore'
 #     }
 # }
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'HOST':'db',
-        'PORT':'3306',
-        'USER':'admin',
-        'PASSWORD':'admin',
-        'NAME': 'dentistore'
-    }
-}
 
 
 STATIC_ROOT = Path.joinpath(BASE_DIR,'staticfiles')
