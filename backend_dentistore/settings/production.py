@@ -16,9 +16,9 @@ ALLOWED_HOSTS = ['*']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST':'143.198.49.231',
+        'HOST':'localhost',
         'PORT':'3306',
-        'USER':'backend',
+        'USER':'root',
         'PASSWORD':'d3nt1st0r3',
         'NAME': 'dentistore'
     }
