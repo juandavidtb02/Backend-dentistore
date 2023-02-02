@@ -34,7 +34,7 @@ class LoginView(APIView):
             'id':user.userid,
             'usermail':user.usermail,
             'role':user.userrole,
-            'exp':datetime.datetime.utcnow() + datetime.timedelta(minutes=30),
+            'exp':datetime.datetime.utcnow() + datetime.timedelta(minutes=1),
             'iat':datetime.datetime.utcnow()
         }
 
@@ -45,9 +45,16 @@ class LoginView(APIView):
         try:
             log = UserLog.objects.create(id=uid,token=token)
         except:
-            raise AuthenticationFailed('Usuario ya se encuentra logeado!')
-            
+            try:
+                data_log = UserLog.objects.filter(id=uid).first()
+                old_token = data_log.token
+                payload = jwt.decode(old_token, 'secret', algorithms=['HS256'])
+                raise AuthenticationFailed('Usuario ya se encuentra logeado!')
+            except jwt.ExpiredSignatureError:
+                UserLog.objects.filter(token=old_token).delete()
 
+            
+        log = UserLog.objects.create(id=uid,token=token)
         response.data = {
             'jwt': token
         }
