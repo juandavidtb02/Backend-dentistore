@@ -52,25 +52,22 @@ class LoginView(APIView):
                 raise AuthenticationFailed('Usuario ya se encuentra logeado!')
             except jwt.ExpiredSignatureError:
                 UserLog.objects.filter(token=old_token).delete()
+                log = UserLog.objects.create(id=uid,token=token)
 
-            
-        log = UserLog.objects.create(id=uid,token=token)
         response.data = {
             'jwt': token
         }
         return response
 
 class UserView(APIView):
-    def get(self,request):
+    def post(self,request):
         token = request.META.get('HTTP_AUTHORIZATION')
-
         payload = validar(token,request)
         new_token = refresh_token(payload,request)
         user = Users.objects.filter(userid=payload['id']).first()
-        serializer = UserSerializer(user)
+        UserSerializer(user)
         response = Response()
         response.data = {
-            'data': serializer.data,
             'token':new_token
         }
         return response
