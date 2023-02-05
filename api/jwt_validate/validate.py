@@ -5,19 +5,19 @@ import jwt,datetime,re
 def validar(tokenu,request):
     g = re.match("^Bearer\s+(.*)", tokenu)
     if not g:
-        raise AuthenticationFailed('Error de autenticación! 01')
+        raise AuthenticationFailed('Error de autenticación! 01 (validar)')
 
     try:
         tokenu = g.group(1)
         payload = jwt.decode(tokenu, 'secret', algorithms=['HS256'])
     except jwt.ExpiredSignatureError:
         UserLog.objects.filter(token=tokenu).delete()
-        raise AuthenticationFailed('Error de autenticación! 02')
+        raise AuthenticationFailed('Error de autenticación! 02 (validar)')
 
 
     user = list(UserLog.objects.filter(token=tokenu).values())
     if len(user) == 0:
-        raise AuthenticationFailed('Error de autenticación! 03')
+        raise AuthenticationFailed('Error de autenticación! 03 (validar)')
     
     
     return payload
@@ -29,6 +29,7 @@ def refresh_token(payload,request):
     new_payload = {
         'id':payload['id'],
         'usermail':payload['usermail'],
+        'username':payload['username'],
         'role':payload['role'],
         'exp':datetime.datetime.utcnow() + datetime.timedelta(minutes=30),
         'iat':datetime.datetime.utcnow()
@@ -44,12 +45,12 @@ def its_admin(token):
     try:
         payload = jwt.decode(token, 'secret', algorithms=['HS256'])
     except jwt.ExpiredSignatureError:
-        raise AuthenticationFailed('Error de autenticación! 02')
+        raise AuthenticationFailed('Error de autenticación! 02 (admin)')
 
     if (payload['role'] == 'admin'):    
         user = list(Users.objects.filter(usermail=payload['usermail'],userrole='admin').values())
         if len(user) == 0:
-            raise AuthenticationFailed('Error de autenticacion! 03')
+            raise AuthenticationFailed('Error de autenticacion! 03 (admin)')
     else:
         raise AuthenticationFailed('Error de autencicacion! n_a')
 

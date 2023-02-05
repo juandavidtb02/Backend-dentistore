@@ -17,7 +17,6 @@ class Categories(models.Model):
 class Colors(models.Model):
     color_id = models.CharField(primary_key=True, max_length=15)
     color_name = models.CharField(max_length=25)
-    color_category = models.CharField(max_length=25)
 
     class Meta:
         managed = False
