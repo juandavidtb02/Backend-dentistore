@@ -6,6 +6,7 @@ from .serializer import UserSerializer,CategoriesSerializer,ProductsSerializer,C
 from .models import Users,Categories,UserLog,Products,Images_products
 from .jwt_validate.validate import validar,refresh_token,its_admin
 from django.conf import settings
+from rest_framework.decorators import action
 
 import jwt,datetime,re
 import base64
@@ -101,6 +102,11 @@ class LogoutView(APIView):
         except:
             raise AuthenticationFailed('La sesión no existe! Error 03')
         return response
+    
+class CategoriesNameView(APIView):
+    def get(self,request):
+        datos = Categories.objects.values('category_id','category_name')
+        return Response(datos)
 
 class CategoriesView(APIView):
     def get(self,request):
@@ -412,6 +418,57 @@ class ProductsView(APIView):
 
 
         return response
+    
+    def delete(self,request):
+        response = Response()
+
+        token = request.META.get('HTTP_AUTHORIZATION')
+        payload = validar(token,request)
+        new_token = refresh_token(payload,request)
+
+        try:
+            product_id = request.data['product_id']
+
+        except Exception as e:
+            print(e)
+            response.data = {
+                'message' : 'Error al eliminar producto',
+                'token':new_token
+                }
+            response.status_code = 500
+            
+            return response
+        
+        if(its_admin(new_token) != True):
+            response.data = {
+            'message' : 'El usuario no tiene los permisos necesarios',
+            'token':new_token
+            }
+            response.status_code = 403
+
+            
+            return response        
+
+        try:
+            Products.objects.filter(product_id=product_id).delete()
+        except Exception as e:
+            print(e)
+            response.data = {
+            'message' : 'Error al borrar producto o imagenes',
+            'token':new_token
+            }
+            response.status_code = 500
+            
+            return response
+
+        response.data = {
+            'message' : 'Producto eliminado correctamente',
+            'token':new_token
+        }
+
+
+        return response
+
 
 class ImagesProductsView(APIView):
     def post(self,request):
@@ -431,7 +488,7 @@ class ImagesProductsView(APIView):
         except Exception as e:
             print(e)
             response.data = {
-                'message' : 'Error al registrar categoria',
+                'message' : 'Error al registrar imagen',
                 'token':new_token
                 }
             response.status_code = 500
@@ -451,7 +508,7 @@ class ImagesProductsView(APIView):
             Images_products.objects.create(image_name=image_name,image_text=encoded_string.decode(),product_id=product_id)
         except Exception as e:
             response.data = {
-            'message' : 'Error al crear categoria',
+            'message' : 'Error al crear imagen',
             'token':new_token
             }
             response.status_code = 500
@@ -463,6 +520,55 @@ class ImagesProductsView(APIView):
             'message' : 'Producto añadido correctamente',
             'token':new_token
         }
+
+        return response
+
+    def delete(self,request):
+        response = Response()
+
+        token = request.META.get('HTTP_AUTHORIZATION')
+        payload = validar(token,request)
+        new_token = refresh_token(payload,request)
+
+        try:
+            image_id = request.data['image_id']
+
+        except Exception as e:
+            print(e)
+            response.data = {
+                'message' : 'Error al registrar categoria',
+                'token':new_token
+                }
+            response.status_code = 500
+            
+            return response
+        
+        if(its_admin(new_token) != True):
+            response.data = {
+            'message' : 'El usuario no tiene los permisos necesarios',
+            'token':new_token
+            }
+            response.status_code = 403
+
+            
+            return response        
+
+        try:
+            Images_products.objects.filter(image_id=image_id).delete()
+        except Exception as e:
+            response.data = {
+            'message' : 'Error al borrar imagen',
+            'token':new_token
+            }
+            response.status_code = 500
+            
+            return response
+
+        response.data = {
+            'message' : 'Imagen eliminada correctamente',
+            'token':new_token
+        }
+
 
         return response
 

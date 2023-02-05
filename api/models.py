@@ -77,7 +77,7 @@ class Images_products(models.Model):
     image_id = models.AutoField(primary_key=True)
     image_name = models.CharField(max_length=30)
     image_text = models.TextField()
-    product = models.ForeignKey(Products, models.DO_NOTHING)
+    product = models.ForeignKey(Products, on_delete=models.CASCADE)
 
     class Meta:
         managed = False

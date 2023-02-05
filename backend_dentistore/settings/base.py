@@ -30,12 +30,12 @@ BASE_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
+    'api',
     "django_extensions"
     ]
 
 LOCAL_APPS = [
-    'api',
-    'apps.core'
+    'backend_dentistore',
 ]
 
 THIRD_APPS = [
