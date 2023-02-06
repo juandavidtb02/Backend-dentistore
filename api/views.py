@@ -2,11 +2,13 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
-from .serializer import UserSerializer,CategoriesSerializer,ProductsSerializer,ClientesSerializer
-from .models import Users,Categories,UserLog,Products,Images_products
+from .serializer import UserSerializer,CategoriesSerializer,ProductsSerializer,ClientesSerializer,ColorSerializer
+from .models import Users,Categories,UserLog,Products,Images_products,Colors,ProductColor
 from .jwt_validate.validate import validar,refresh_token,its_admin
 from django.conf import settings
 from rest_framework.decorators import action
+
+from django.db.models import Prefetch
 
 import jwt,datetime,re
 import base64
@@ -336,6 +338,9 @@ class ClientsView(APIView):
 
 class ProductsView(APIView):
     def get(self, request):
+
+        colores = ProductColor.objects.select_related('product').select_related('color').all()
+
         products = Products.objects.select_related('category').prefetch_related('images_products_set').all()
         data = []
         for product in products:
@@ -346,6 +351,14 @@ class ProductsView(APIView):
                     'image_name': image.image_name,
                     'image_text': image.image_text,
                 })
+            product_colors = []
+            for color in colores:
+                if color.product == product:
+                    product_colors.append({
+                        'color_id': color.color.color_id,
+                        'color_name': color.color.color_name,
+                        'color_stock': color.color_stock
+                    })
             data.append({
                 'product_id': product.product_id,
                 'product_name': product.product_name,
@@ -360,8 +373,10 @@ class ProductsView(APIView):
                     'category_image': product.category.category_image,
                 },
                 'images': images,
+                'colors': product_colors
             })
         return Response(data)
+
 
 
     
@@ -395,6 +410,7 @@ class ProductsView(APIView):
             'message' : 'El usuario no tiene los permisos necesarios',
             'token':new_token
             }
+            print('x')
             response.status_code = 403
 
             
@@ -444,6 +460,8 @@ class ProductsView(APIView):
             'message' : 'El usuario no tiene los permisos necesarios',
             'token':new_token
             }
+            print('xsx')
+
             response.status_code = 403
 
             
@@ -573,7 +591,169 @@ class ImagesProductsView(APIView):
         return response
 
         
+class ColorsView(APIView):
+    def get(self,request):
+        data = Colors.objects.all()
+        serializer = ColorSerializer(data,many=True)
+        return Response(serializer.data)
 
+    def post(self,request):
+        response = Response()
+
+        token = request.META.get('HTTP_AUTHORIZATION')
+        payload = validar(token,request)
+        new_token = refresh_token(payload,request)
+
+        try:
+            color_id = request.data['color_id']
+            color_name = request.data['color_name']
+
+        except Exception as e:
+            print(e)
+            response.data = {
+                'message' : 'Error al registrar color',
+                'token':new_token
+                }
+            response.status_code = 500
+            
+            return response
+        
+        if(its_admin(new_token) != True):
+            response.data = {
+            'message' : 'El usuario no tiene los permisos necesarios',
+            'token':new_token
+            }
+            print('xd')
+            response.status_code = 403
+
+            
+            return response        
+
+        try:
+            Colors.objects.create(color_id=color_id,color_name=color_name)
+        except Exception as e:
+            print(e)
+            response.data = {
+            'message' : 'Error al crear imagen',
+            'token':new_token
+            }
+            response.status_code = 500
+            
+            return response
+
+        response.data = {
+            'message' : 'Color creado correctamento',
+            'token':new_token
+        }
+
+
+        return response
+    
+    def delete(self,request):
+        response = Response()
+
+        token = request.META.get('HTTP_AUTHORIZATION')
+        payload = validar(token,request)
+        new_token = refresh_token(payload,request)
+
+        try:
+            color_id = request.data['color_id']
+
+        except Exception as e:
+            print(e)
+            response.data = {
+                'message' : 'Error al eliminar el color',
+                'token':new_token
+                }
+            response.status_code = 500
+            
+            return response
+        
+        if(its_admin(new_token) != True):
+            response.data = {
+            'message' : 'El usuario no tiene los permisos necesarios',
+            'token':new_token
+            }
+            
+            response.status_code = 403
+
+            
+            return response        
+
+        try:
+            Colors.objects.filter(color_id=color_id).delete()
+        except Exception as e:
+            print(e)
+            response.data = {
+            'message' : 'Error al eliminar color',
+            'token':new_token
+            }
+            response.status_code = 500
+            
+            return response
+
+        response.data = {
+            'message' : 'Color eliminado correctamento',
+            'token':new_token
+        }
+
+
+        return response
+
+
+class ProductColorView(APIView):
+    def post(self,request):
+        response = Response()
+
+        # token = request.META.get('HTTP_AUTHORIZATION')
+        # payload = validar(token,request)
+        # new_token = refresh_token(payload,request)
+
+        try:
+            color_id = request.data['color_id']
+            product_id = request.data['product_id']
+            color_stock = request.data['color_stock']
+
+        except Exception as e:
+            print(e)
+            # response.data = {
+            #     'message' : 'Error al eliminar el color',
+            #     'token':new_token
+            #     }
+            response.status_code = 500
+            
+            return response
+        
+        # if(its_admin(new_token) != True):
+        #     response.data = {
+        #     'message' : 'El usuario no tiene los permisos necesarios',
+        #     'token':new_token
+        #     }
+            
+        #     response.status_code = 403
+
+            
+        #     return response        
+
+        try:
+            ProductColor.objects.create(product_id=product_id,color_id=color_id,color_stock=color_stock)
+        except Exception as e:
+            print(e)
+            # response.data = {
+            # 'message' : 'Error al eliminar color',
+            # 'token':new_token
+            # }
+            response.status_code = 500
+            
+            return response
+
+        # response.data = {
+        #     'message' : 'Color eliminado correctamento',
+        #     'token':new_token
+        # }
+
+
+        return response
         
 
 

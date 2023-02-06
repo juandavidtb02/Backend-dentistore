@@ -1,6 +1,6 @@
 
 from django.urls import path
-from .views import RegisterView,LoginView,UserView,LogoutView,CategoriesView,ProductsView,ClientsView,ImagesProductsView,CategoriesNameView
+from .views import RegisterView,LoginView,UserView,LogoutView,CategoriesView,ProductsView,ClientsView,ImagesProductsView,CategoriesNameView,ColorsView,ProductColorView
 urlpatterns = [
     path('register/', RegisterView.as_view()),
     path('login/', LoginView.as_view()),
@@ -11,6 +11,8 @@ urlpatterns = [
     path('products/',ProductsView.as_view()),
     path('clientes/',ClientsView.as_view()),
     path('imagesProducts/',ImagesProductsView.as_view()),
+    path('colors/',ColorsView.as_view()),
+    path('productcolors/',ProductColorView.as_view()),
 
 
 ]

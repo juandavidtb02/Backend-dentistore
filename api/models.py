@@ -49,8 +49,8 @@ class Orders(models.Model):
 
 
 class ProductColor(models.Model):
-    product = models.OneToOneField('Products', models.DO_NOTHING, primary_key=True)
-    color = models.ForeignKey(Colors, models.DO_NOTHING)
+    product = models.OneToOneField('Products', on_delete=models.CASCADE, primary_key=True)
+    color = models.ForeignKey(Colors, on_delete=models.CASCADE)
     color_stock = models.IntegerField()
 
     class Meta:
@@ -67,7 +67,7 @@ class Products(models.Model):
     product_image = models.CharField(max_length=200, blank=True, null=True)
     product_descrip = models.CharField(max_length=300, blank=True, null=True)
     product_details = models.CharField(max_length=300, blank=True, null=True)
-    category = models.ForeignKey(Categories, models.DO_NOTHING)
+    category = models.ForeignKey(Categories,  on_delete=models.CASCADE)
 
     class Meta:
         managed = False

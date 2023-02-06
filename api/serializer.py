@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Users,Categories,Products,Images_products
+from .models import Users,Categories,Products,Images_products,Colors
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -59,4 +59,8 @@ class ClientesSerializer(serializers.ModelSerializer):
           model = Users
           fields = ['userid','usermail','username','userphone','date_joined']
 
+class ColorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Colors
+        fields = ['color_id','color_name']
     
